@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/InputComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "Grabber.generated.h" // Needs to be the last include because of reasons
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
