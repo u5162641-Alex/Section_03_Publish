@@ -301,3 +301,11 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Unreal folders
+*/Binaries
+*/Intermediate
+*/Build
+*/DerivedDataCache
+*/Saved
+BuildingEscape/Content/StarterContent/
