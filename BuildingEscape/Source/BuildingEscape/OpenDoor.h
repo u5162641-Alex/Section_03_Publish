@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/TriggerVolume.h"
-
+#include "Components/PrimitiveComponent.h"
 // Needs to be the last include because of reasons
 #include "OpenDoor.generated.h"
 
@@ -30,6 +30,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	
+
 private:
 	UPROPERTY(EditAnywhere)
 		float OpenAngle = 80.f;
@@ -37,7 +39,8 @@ private:
 	UPROPERTY(EditAnywhere)
 		ATriggerVolume* PressurePlate;
 	
-	AActor* ActorThatOpens; // NOTE Pawn inherrits from Actor
+	// Removed in update
+	/// AActor* ActorThatOpens; // NOTE Pawn inherrits from Actor
 	
 	UPROPERTY(EditAnywhere)
 		float DoorCloseDelay = 1.f;
@@ -45,4 +48,6 @@ private:
 	float LastDoorOpenTime;
 
 	AActor* Owner; // The owning door
+
+	float GetTotalMassOfActorsOnPlate();
 };

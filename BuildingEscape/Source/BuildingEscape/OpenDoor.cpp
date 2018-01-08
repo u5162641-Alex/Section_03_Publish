@@ -7,7 +7,7 @@
 // within the GameFramework directory - Good for learning, bad for optimization
 #include "GameFramework/all_headers.h" 
 
-
+#define OUT
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -25,7 +25,11 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn(); // find the player's pawn
+	// Removed in update
+	///ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn(); // find the player's pawn
+	
+	
+
 	Owner = GetOwner(); // set the owner to the owning door instance
 	// ...
 	
@@ -50,8 +54,8 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// If the ActorThatOpens is in the volume
-	if (PressurePlate->IsOverlappingActor(ActorThatOpens)) 
+	// Polling the trigger volume
+	if (GetTotalMassOfActorsOnPlate()>=60.f) //TODO Make into parameter 
 	{
 		OpenDoor();
 		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
@@ -67,3 +71,19 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	// ...
 }
 
+float UOpenDoor::GetTotalMassOfActorsOnPlate()
+{
+	float TotalMass = 0.f;
+
+	//Find all overlapping actors
+	TArray<AActor*> OverlappingActors;
+	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+
+	// TODO itterate through them adding their masses
+	for (const auto* ActorOnTrigger : OverlappingActors)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Actor on plate: %s"), *ActorOnTrigger->GetName());
+		TotalMass += ActorOnTrigger->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+	return TotalMass;
+}
