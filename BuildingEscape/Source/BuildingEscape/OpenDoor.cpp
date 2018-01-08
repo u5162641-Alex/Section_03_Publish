@@ -27,26 +27,22 @@ void UOpenDoor::BeginPlay()
 
 	// Removed in update
 	///ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn(); // find the player's pawn
-	
-	
-
 	Owner = GetOwner(); // set the owner to the owning door instance
+
+
+	if (!PressurePlate)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s cannot find a Trigger Volume"),
+			*GetOwner()->GetName()
+		);
+	}
+
+	
 	// ...
 	
 }
 
-void UOpenDoor::OpenDoor() 
-{
-	// set the door rotation
-	Owner->SetActorRotation(FRotator(0.f, OpenAngle, 0.f));
-}
 
-void UOpenDoor::CloseDoor() 
-{
-
-	// set the door rotation
-	Owner->SetActorRotation(FRotator(0.f, 0.f, 0.f));
-}
 
 
 // Called every frame
@@ -55,17 +51,15 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// Polling the trigger volume
-	if (GetTotalMassOfActorsOnPlate()>=60.f) //TODO Make into parameter 
+	if (GetTotalMassOfActorsOnPlate()>=TriggerMass) //TODO Make into parameter 
 	{
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast(); // Broad cast on event for BluePrint
+	}
+	else
+	{
+		OnClose.Broadcast();
 	}
 	
-	// check if its time to close the door
-	if (GetWorld()->GetTimeSeconds() >= LastDoorOpenTime + DoorCloseDelay)
-	{
-		CloseDoor();
-	}
 
 	
 	// ...
@@ -77,7 +71,9 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 
 	//Find all overlapping actors
 	TArray<AActor*> OverlappingActors;
+	if (!PressurePlate) { return TotalMass; }
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+
 
 	// TODO itterate through them adding their masses
 	for (const auto* ActorOnTrigger : OverlappingActors)
